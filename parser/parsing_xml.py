@@ -1,6 +1,5 @@
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element
-from typing import List
 
 
 def __con_dicts(dict1: dict, dict2: dict) -> dict:
@@ -8,6 +7,7 @@ def __con_dicts(dict1: dict, dict2: dict) -> dict:
     Конкантинация словарей
     """
     return dict(list(dict1.items()) + list(dict2.items()))
+
 
 def __tag_to_json(tag: Element):
     """
@@ -40,7 +40,7 @@ def __parsing_entry_xml(xml_entry: Element) -> dict:
     return response
 
 
-def parsing_xml(path_file_xml: str) -> List[dict]:
+def parsing_xml(path_file_xml: str) -> tuple:
     """
     Парсинг xml - файла.
     :param path_file_xml: путь до файла xml
@@ -51,7 +51,7 @@ def parsing_xml(path_file_xml: str) -> List[dict]:
     result = []
     for elem in root:
         result.append(__parsing_entry_xml(elem))
-    return result
+    return tuple(result)
 
 
 def json_to_dict(json, name_tag=None) -> dict:
