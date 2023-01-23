@@ -8,10 +8,11 @@ class WorkWithXmlMultiProcess:
     """
     Класс для запуска множества потоков.
     """
-    def __init__(self, path_in_file: str, path_out_dir: str = 'out/', count_threads: int = 2):
+    def __init__(self, path_in_file: str, working_func, path_out_dir: str = 'out/', count_threads: int = 2):
         """
         Инициализация класса.
         :param path_in_file: путь до входного файла xml.
+        :param working_func: используемая в обработке функция.
         :param path_out_dir: путь выходного каталога.
         :param count_threads: количесто потоков.
         """
@@ -22,6 +23,7 @@ class WorkWithXmlMultiProcess:
         self.count_threads = count_threads
         self.header = None
         self.processes = []
+        self.working_function = working_func
 
     def __run_processes(self):
         """
@@ -43,7 +45,9 @@ class WorkWithXmlMultiProcess:
         for index, entry in enumerate(parsing_xml(self.in_file)):
             if index % self.count_threads == 0:
                 self.__run_processes()
-            self.processes.append(Process(target=write_txt, args=(json_to_dict(entry), self.path_out_dir,), daemon=True))
+            self.processes.append(Process(target=self.working_function,
+                                          args=(json_to_dict(entry), self.path_out_dir,),
+                                          daemon=True))
         self.__run_processes()
         return
 
