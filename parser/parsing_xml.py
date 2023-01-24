@@ -1,6 +1,8 @@
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element
 
+from lxml import etree
+
 
 def __con_dicts(dict1: dict, dict2: dict) -> dict:
     """
@@ -70,4 +72,31 @@ def json_to_dict(json, name_tag=None) -> dict:
             response[new_key] = json[key]
     return response
 
+
+def parsing_elem_xml_str(entry_str: str):
+    """
+
+    :param entry_str:
+    :return:
+    """
+    parser1 = etree.XMLParser(encoding="utf-8", recover=True)
+    elem = ET.fromstring(entry_str, parser1)
+    return __parsing_entry_xml(elem)
+
+if __name__ == '__main__':
+    str_element = """
+    <entry sourceId="100" xsi:type="imp:ImportedEntry">
+		<data  name="Санкт-Петербург" latitude="55,098765" longitude="55,098765" UTC="Europe/Moscow" 
+		 nearestTown="Санкт-Петербург" shortLatName="Spb" shortName="Спб" otiCode="1234567890"
+		xsi:type="onsi-stat:ShipStation">
+			<actualPeriod  from="2013-04-22T00:00Z" to="2023-04-20T00:00Z" xsi:type="dt:ImportDateTimePeriod"/>
+			<countryCode value="Российская Федерация"
+				xsi:type="dt:SimpleDictionaryValue" />
+			<federalSubject value="Санкт-Петербург"
+				xsi:type="dt:SimpleDictionaryValue" />
+			<okato value="40263561000" xsi:type="dt:SimpleDictionaryValue" />
+			<portType>true</portType>
+		</data>
+                   </entry>
+    """
 

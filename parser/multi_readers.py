@@ -1,7 +1,8 @@
 import os
 from multiprocessing import Process
+from threading import Thread
 
-from parsing_xml import parsing_xml, json_to_dict
+from parsing_xml import parsing_xml, json_to_dict, parsing_elem_xml_str
 
 
 class WorkWithXmlMultiProcess:
@@ -24,6 +25,8 @@ class WorkWithXmlMultiProcess:
         self.header = None
         self.processes = []
         self.working_function = working_func
+        self.keyword_start = '<' + 'entry'
+        self.keyword_end = '</' + 'entry'
 
     def __run_processes(self):
         """
@@ -43,12 +46,38 @@ class WorkWithXmlMultiProcess:
         """
         # обход файла и последующий запуск процессов
         for index, entry in enumerate(parsing_xml(self.in_file)):
-            if index % self.count_threads == 0:
+            if index % self.count_threads == 0 and index != 0:
                 self.__run_processes()
-            self.processes.append(Process(target=self.working_function,
-                                          args=(json_to_dict(entry), self.path_out_dir,),
-                                          daemon=True))
+            self.processes.append(Thread(target=self.working_function,
+                                          args=(json_to_dict(entry), self.path_out_dir,)))
         self.__run_processes()
+        return
+
+    def run_1(self):
+        """
+
+        :return:
+        """
+        index = 0
+        with open(self.in_file, 'r', encoding='utf-8') as file:
+            entry_str = ''
+            for line in file:
+                if index % self.count_threads == 0 and index != 0:
+                    self.__run_processes()
+                if self.keyword_start in line:
+                    entry_str = ''
+                entry_str += line
+                if self.keyword_end in line:
+                    entry = parsing_elem_xml_str(entry_str)
+                    self.processes.append(Thread(target=self.working_function,
+                                                  args=(json_to_dict(entry), self.path_out_dir,)))
+                    index += 1
+        return
+
+    def run_2(self):
+        for index, entry in enumerate(parsing_xml(self.in_file)):
+
+            self.working_function(json_to_dict(entry), self.path_out_dir)
         return
 
 
